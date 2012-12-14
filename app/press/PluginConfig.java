@@ -48,6 +48,9 @@ public class PluginConfig {
         // compiled, they will be output raw.
         public static final boolean outputRawLess = false;
 
+        // If enabled, turns on gzip when the client supports it
+        public static final boolean gzipEnabled = false;
+
         public static class js {
             // The directory where source javascript files are read from
             public static final String srcDir = "/public/javascripts/";
@@ -85,6 +88,7 @@ public class PluginConfig {
     public static String contentHostingDomain;
     public static String p3pHeader;
     public static boolean outputRawLess;
+    public static boolean gzipEnabled;
 
     public static class js {
         public static String srcDir = DefaultConfig.js.srcDir;
@@ -134,6 +138,7 @@ public class PluginConfig {
                 DefaultConfig.contentHostingDomain);
         p3pHeader = ConfigHelper.getString("press.p3pHeader", DefaultConfig.p3pHeader);
         outputRawLess = ConfigHelper.getBoolean("press.outputRawLess", DefaultConfig.outputRawLess);
+        gzipEnabled = ConfigHelper.getBoolean("press.gzipEnabled", DefaultConfig.gzipEnabled);
 
         css.srcDir = ConfigHelper.getString("press.css.sourceDir", DefaultConfig.css.srcDir);
         css.compressedDir = ConfigHelper.getString("press.css.outputDir",

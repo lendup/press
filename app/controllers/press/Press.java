@@ -88,7 +88,9 @@ public class Press extends Controller {
         //
         Header encodings = request.headers.get("accept-encoding");
 
-        if ((encodings != null) && (encodings.value().indexOf("gzip") != -1)) {
+        if (PluginConfig.gzipEnabled &&
+                (encodings != null) &&
+                (encodings.value().indexOf("gzip") != -1)) {
             try {
                 ByteArrayOutputStream gzip = Gzip.gzip(inputStream);
                 response.setHeader("Content-Encoding", "gzip");
