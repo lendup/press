@@ -1,6 +1,7 @@
 package controllers.press;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -9,8 +10,10 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import play.Logger;
 import play.exceptions.UnexpectedException;
 import play.mvc.Controller;
+import play.mvc.Http.Header;
 import press.CachingStrategy;
 import press.PluginConfig;
 import press.ScriptCompressedFileManager;
@@ -21,6 +24,7 @@ import press.StyleCompressor;
 import press.StyleRequestHandler;
 import press.io.CompressedFile;
 import press.io.FileIO;
+import press.io.Gzip;
 
 public class Press extends Controller {
     public static final DateTimeFormatter httpDateTimeFormatter = DateTimeFormat
@@ -77,6 +81,21 @@ public class Press extends Controller {
             response.setHeader("Expires", httpDateTimeFormatter.print(new DateTime().plusYears(1)));
             if(!PluginConfig.p3pHeader.isEmpty()) {
                 response.setHeader("P3P", PluginConfig.p3pHeader);
+            }
+        }
+
+        // attempt gzip if the client requests it.
+        //
+        Header encodings = request.headers.get("accept-encoding");
+
+        if ((encodings != null) && (encodings.value().indexOf("gzip") != -1)) {
+            try {
+                ByteArrayOutputStream gzip = Gzip.gzip(inputStream);
+                response.setHeader("Content-Encoding", "gzip");
+                response.setHeader("Content-Length", gzip.size() + "");
+                renderBinary(new ByteArrayInputStream(gzip.toByteArray()), compressedFile.name());
+            } catch (IOException e) {
+                Logger.error(e, "Unable to compress output: %s", e.getMessage());
             }
         }
 
