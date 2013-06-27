@@ -84,6 +84,14 @@ public class Press extends Controller {
             }
         }
 
+        /*
+         * google wants this: "Instructs proxy servers to cache two versions
+         * of the resource: one compressed, and one uncompressed. This helps
+         * avoid issues with public proxies that do not detect the presence
+         * of a Content-Encoding header properly."
+         */
+        response.headers.put("Vary", new Header("Vary", "Accept-Encoding"));
+
         // attempt gzip if the client requests it.
         //
         Header encodings = request.headers.get("accept-encoding");
